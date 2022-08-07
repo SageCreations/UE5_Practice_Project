@@ -27,7 +27,6 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void Attack();
-	void AttackCoolDown(float DeltaTime);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Animations")
 	UAnimationAsset* AttackAnimationAsset;
