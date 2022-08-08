@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Camera/CameraComponent.h"
+#include "Components/BoxComponent.h"
 #include "GameFramework/Character.h"
 #include "PlayerCharacterController.generated.h"
 
@@ -14,6 +16,12 @@ class UE5_PRACTICE_PROJECT_API APlayerCharacterController : public ACharacter
 public:
 	// Sets default values for this character's properties
 	APlayerCharacterController();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="GameSceneCamera")
+	UCameraComponent* CameraComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="PlayerAlignmentTool")
+	UBoxComponent* BoxComponent;
 
 protected:
 	// Called when the game starts or when spawned
