@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Components/BoxComponent.h"
-#include "Components/CapsuleComponent.h"
 #include "GameFramework/Actor.h"
 #include "SpawnLevelSection.generated.h"
 
@@ -35,6 +34,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="AssetsToSpawn")
 	TArray<UBlueprint*> ObjectList;
 
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -43,9 +43,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	void SpawnNextSection();
-
-	bool bSpawn;
+	FTransform GetAttachTransform() const;
 	
 
 };
