@@ -3,8 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ActorFactories/ActorFactoryBasicShape.h"
-#include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/Actor.h"
@@ -23,10 +21,10 @@ public:
 	UStaticMeshComponent* StaticMeshComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UArrowComponent* ArrowComponent;
+	UBoxComponent* BoxSpawnPoint;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UBoxComponent* BoxComponent;
+	UBoxComponent* BoxTriggerPoint;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="AssetsToSpawn")
 	TArray<UBlueprint*> EnemyList;
@@ -46,5 +44,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	void SpawnNextSection();
+
+	bool bSpawn;
+	
 
 };
