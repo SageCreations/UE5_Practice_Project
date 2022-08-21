@@ -1,6 +1,5 @@
 #include "PlayerCharacterController.h"
 #include <string>
-
 #include "Components/ArrowComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -17,8 +16,10 @@ APlayerCharacterController::APlayerCharacterController()
 void APlayerCharacterController::BeginPlay()
 {
 	Super::BeginPlay();
+	
+
 	bIsAttacking = false;
-	timer = 0.0f;
+	AttackCoolDownTimer = AttackAnimationAsset->GetPlayLength();
 }
 
 // Called every frame
@@ -29,8 +30,7 @@ void APlayerCharacterController::Tick(float DeltaTime)
 	// makes the character move to the right on the x-axis by force.
 	this->APawn::AddMovementInput(this->GetActorForwardVector(), 1.0f, true);
 	
-	AttackCoolDown(DeltaTime);
-
+	
 }
 
 // Called to bind functionality to input
@@ -54,25 +54,20 @@ void APlayerCharacterController::Attack()
 		// debug message for when button input was accepted
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("attack button pressed"));
 
-		timer = AttackAnimationAsset->GetPlayLength();
+		// Starts a timer for the attack cooldown
+		GetWorldTimerManager().SetTimer(AttackCoolDownHandle, this, &APlayerCharacterController::ResetAttackCoolDown, AttackCoolDownTimer, false);
+		
 		this->GetMesh()->PlayAnimation(AttackAnimationAsset, false);
+		
 		bIsAttacking = true;
 	}
 }
 
-void APlayerCharacterController::AttackCoolDown(float DeltaTime)
+
+// Sets the attack boolean back to false and changes the animation back to running
+void APlayerCharacterController::ResetAttackCoolDown()
 {
-	// This is the current code for timing cooldown on player's attack speed
-	// TODO: figure out a way to time it based off the attack swing animation time length.
-	if (bIsAttacking == true && timer > 0.0f)
-	{
-		timer -= 1.1f * DeltaTime; 
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, std::to_string(timer).data());
-		if (timer < 0.0f)
-		{
-			bIsAttacking = false;
-			this->GetMesh()->PlayAnimation(RunAnimationAsset, true);
-		}
-	}
+	this->GetMesh()->PlayAnimation(RunAnimationAsset, true);
+	bIsAttacking = false;
 }
 
