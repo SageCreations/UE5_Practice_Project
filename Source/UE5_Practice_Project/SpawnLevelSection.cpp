@@ -18,6 +18,8 @@ ASpawnLevelSection::ASpawnLevelSection()
 	BoxTriggerPoint = CreateDefaultSubobject<UBoxComponent>("Trigger Next Spawn");
 	BoxSpawnPoint = CreateDefaultSubobject<UBoxComponent>("New Floor Spawn Point");
 
+	
+
 	// Creating the hierarchy
 	RootComponent = StaticMeshComponent;
 	BoxTriggerPoint->SetupAttachment(StaticMeshComponent);
@@ -40,6 +42,9 @@ void ASpawnLevelSection::BeginPlay()
 
 	// sets the object's life for 5 seconds (calls destroy() at end of timer) - (this is a feature built in Actor parent class)
 	SetLifeSpan(LifeSpanTimer);
+
+	
+	
 	
 	
 }
@@ -61,53 +66,53 @@ UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHi
 		if (Cast<APlayerCharacterController>(OtherActor))
 		{
 			// if its true then spawn the next floor piece
-			AddFloorTile();
+			AddNextSection();
 		}
 	}
 }
 
 // Adds a new Floor Tile Blueprint in the world
-void ASpawnLevelSection::AddFloorTile()
+void ASpawnLevelSection::AddNextSection()
 {
-	UWorld* World = GetWorld();
-	const FActorSpawnParameters Params;
+	SpawnFloor();
 
-	// Spawn actor of desired class
-	AActor* SpawnedSection = World->SpawnActor<ASpawnLevelSection>(
-		this->GetClass(),
-		BoxSpawnPoint->GetComponentTransform().GetLocation() + FloorSpawnOffset.GetLocation(),
-		BoxSpawnPoint->GetComponentTransform().Rotator(),
-		Params
-	);
+	//TODO: redesign how the spawning works, make it more abstract so that each object spawned is blueprint with its own code.
 
 	// spawns the rest of the stuff that will be placed on the floor
 	SpawnEnemies();
 	SpawnObjects();
 }
 
+// Spawns next floor peice
+void ASpawnLevelSection::SpawnFloor()
+{
+	// Get a random int32
+	int RandNum = FMath::RandRange(0, FloorList.Max());
+	
+	// Spawn actor of desired class
+	GetWorld()->SpawnActor<AActor>(
+		FloorList[RandNum],
+		BoxSpawnPoint->GetComponentTransform().GetLocation() + FloorSpawnOffset.GetLocation(),
+		BoxSpawnPoint->GetComponentTransform().Rotator()
+	);
+}
+
+// Spawns an enemy
 void ASpawnLevelSection::SpawnEnemies()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, TEXT("entered function"));
-	UWorld* World = GetWorld();
-	// create params struct
-	const FActorSpawnParameters Params;
-
-	// get random enemy from the list
-	int RandNum = FMath::TruncToInt(FMath::FRandRange(0, 2));
+	// Get a random int32
+	int RandNum = FMath::RandRange(0, 1);
 	
-	// get random location betwenn range variables
-	FVector location = FVector(0.0f, 0.0f, 20.0f);
-		//FVector(FMath::FRandRange(MinEnemySpawnRange.X, MaxEnemySpawnRange.X), 0.0f, 50.0f);
-
-	// TODO: for somereason this doesnt error but it doesnt spawn either, figure it out.
-	AActor* SpawnedEnemy = World->SpawnActor<AActor>(
-		EnemyList[RandNum]->GetClass(),
-		location,
-		BoxSpawnPoint->GetComponentTransform().Rotator(),
-		Params
+	//Sets the location range for the enemy (absolute world loc, idk why)
+	FVector Location = FVector(FMath::FRandRange(MinEnemySpawnRange, MaxEnemySpawnRange), 0.0f, EnemyHeightPosition);
+	
+	//Spawn the enemy relative to the boxSpawnPoint 
+	GetWorld()->SpawnActor<AActor>(
+		EnemyList[RandNum], 
+		BoxSpawnPoint->GetComponentTransform().GetLocation() + Location,
+		BoxSpawnPoint->GetComponentTransform().Rotator()
 	);
 
-	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, TEXT("should have spawned the enemy"));
 }
 
 void ASpawnLevelSection::SpawnObjects()

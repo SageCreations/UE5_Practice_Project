@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Components/BoxComponent.h"
+#include "EnemyClass.h"
 #include "SpawnLevelSection.generated.h"
 
 UCLASS()
@@ -28,29 +29,35 @@ public:
 	UPROPERTY(EditAnywhere, Category="Components")
 	UBoxComponent* BoxTriggerPoint;
 
-	// An array of enemy blueprints
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="AssetsToSpawn")
-	TArray<UBlueprint*> EnemyList;
+	// An array of enemies
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Enemy Variables")
+	TArray<TSubclassOf<AEnemyClass>> EnemyList;
 
 	// An array of floor blueprints (static mesh is temp, only for testing)
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="AssetsToSpawn")
-	TArray<UStaticMesh*> FloorList;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Floor Variables")
+	TArray<TSubclassOf<AActor>> FloorList;
 
 	// An array of object blueprints
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="AssetsToSpawn")
-	TArray<UBlueprint*> ObjectList;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Object Variables")
+	TArray<TSubclassOf<AActor>> ObjectList;
 
 	// only use the x range and set the most left side you want the enemy to spawn
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Variables")
-	FVector MinEnemySpawnRange;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy Variables")
+	float MinEnemySpawnRange;
 
 	// only use the x range and set the most right side you want the enemy to spawn
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Variables")
-	FVector MaxEnemySpawnRange;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy Variables")
+	float MaxEnemySpawnRange;
 
+	// used for the range on height (z-axis)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy Variables")
+	float EnemyHeightPosition;
+
+	// offset needed for the floor spawn
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Variables")
 	FTransform FloorSpawnOffset;
 
+	// Seconds to wait untill self destruct of object
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Variables")
 	float LifeSpanTimer;
 
@@ -66,8 +73,11 @@ public:
 	UFUNCTION()
 	void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 	
-	// Spawns the next floor piece
-	void AddFloorTile();
+	// Spawns the next section (calls all the spawn functions)
+	void AddNextSection();
+
+	// spawns the floor
+	void SpawnFloor();
 
 	// Spawns enemies for the next section
 	void SpawnEnemies();
